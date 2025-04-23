@@ -1,0 +1,42 @@
+Project Name: Lawgic
+Version: 0.1.0
+Private: true
+
+Description:
+Lawgic is an AI-powered legal assistant that leverages the latest advancements in AI and machine learning to help legal professionals and individuals analyze legal documents. The platform provides services such as summarizing legal documents, predicting potential judgments, and identifying relevant statutes, thereby streamlining the legal process.
+
+Dependencies:
+1. **@radix-ui/react**: A library for building accessible, high-quality UI components.
+2. **autoprefixer**: A tool to parse CSS and add vendor prefixes.
+3. **clsx**: A tiny utility for constructing `className` strings conditionally.
+4. **date-fns**: A library for working with dates in JavaScript.
+5. **embla-carousel-react**: A carousel component for React.
+6. **lucide-react**: A collection of customizable icons for React.
+7. **next**: The React framework for building server-side rendering (SSR) and static web applications.
+8. **react**: A JavaScript library for building user interfaces.
+9. **react-hook-form**: A performant, flexible, and extensible form library for React.
+10. **recharts**: A charting library for building data visualizations in React.
+11. **tailwindcss**: A utility-first CSS framework for building custom designs.
+12. **zod**: A TypeScript-first schema declaration and validation library.
+13. **@huggingface/inference**: A library to use Hugging Face models for inference.
+
+Development Dependencies:
+1. **@types/node**: TypeScript definitions for Node.js.
+2. **@types/react**: TypeScript definitions for React.
+3. **postcss**: A tool for transforming CSS with JavaScript plugins.
+4. **tailwindcss-animate**: Tailwind CSS animations.
+5. **typescript**: A superset of JavaScript that adds static types.
+
+Scripts:
+- **dev**: Run the app in development mode (`next dev`).
+- **build**: Build the app for production (`next build`).
+- **start**: Start the app in production mode (`next start`).
+- **lint**: Run linting checks on the code (`next lint`).
+
+Technologies:
+- **Frontend**: Next.js, React.js, Tailwind CSS
+- **Backend**: FastAPI (for AI services)
+- **AI Models**: Hugging Face models for NLP-based legal document summarization, judgment prediction, and statute identification.
+
+Project Homepage:
+https://lawgic.vercel.app
