@@ -4,10 +4,11 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowRight, Loader2, AlertTriangle } from "lucide-react"
+import { ArrowRight, Loader2, AlertTriangle, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { FileUploader } from "@/components/file-uploader"
 
 interface JudgmentPredictorProps {
   model: string
@@ -20,6 +21,10 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
   const [confidence, setConfidence] = useState(0)
   const [error, setError] = useState("")
   const [isMock, setIsMock] = useState(false)
+  const [modelUsed, setModelUsed] = useState("")
+  const [input, setInput] = useState("")
+  const [output, setOutput] = useState("")
+ 
 
   const handleSubmit = async () => {
     if (!facts.trim()) return
@@ -28,6 +33,7 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
     setPrediction("")
     setError("")
     setIsMock(false)
+    setModelUsed("")
 
     try {
       const response = await fetch("/api/predict-judgment", {
@@ -47,6 +53,7 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
         setPrediction(result.prediction)
         setConfidence(result.confidence)
         setIsMock(result.isMock || false)
+        setModelUsed(result.model_used || model)
       } else {
         setError(result.error || "Failed to predict judgment")
       }
@@ -63,7 +70,9 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
       <Card>
         <CardHeader>
           <CardTitle>Judgment Prediction</CardTitle>
-          <CardDescription>Predict potential legal outcomes based on case facts</CardDescription>
+          <CardDescription>
+            Predict potential legal outcomes based on case facts in the Indian legal system
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -80,6 +89,7 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
               />
             </div>
           </div>
+          <FileUploader onTextExtracted={(text) => setFacts(text)} onError={(errorMsg) => setError(errorMsg)} />
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => setFacts("")}>
@@ -121,15 +131,23 @@ export function JudgmentPredictor({ model }: JudgmentPredictorProps) {
                 </span>
               )}
             </div>
-            <Badge variant="outline" className="ml-2">
-              {confidence}% confidence
-            </Badge>
+            <div className="flex items-center gap-2">
+              {modelUsed && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Info className="h-3 w-3" />
+                  {modelUsed}
+                </Badge>
+              )}
+              <Badge variant="outline" className="ml-2">
+                {confidence}% confidence
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="bg-muted p-4 rounded-md whitespace-pre-wrap">{prediction}</div>
             {isMock && (
               <p className="text-xs text-muted-foreground mt-2">
-                Note: This is a mock prediction. The Hugging Face API request failed, so we're showing simulated data.
+                Note: This is a mock prediction. The backend request failed, so we're showing simulated data.
               </p>
             )}
           </CardContent>

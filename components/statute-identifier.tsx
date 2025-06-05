@@ -4,9 +4,11 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowRight, Loader2, ExternalLink, AlertTriangle } from "lucide-react"
+import { ArrowRight, Loader2, ExternalLink, AlertTriangle, Info } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { FileUploader } from "@/components/file-uploader"
 
 interface StatuteIdentifierProps {
   model: string
@@ -18,6 +20,8 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [isMock, setIsMock] = useState(false)
+  const [modelUsed, setModelUsed] = useState("")
+ 
 
   const handleSubmit = async () => {
     if (!text.trim()) return
@@ -26,6 +30,7 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
     setStatutes([])
     setError("")
     setIsMock(false)
+    setModelUsed("")
 
     try {
       const response = await fetch("/api/identify-statutes", {
@@ -44,6 +49,7 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
       if (result.success) {
         setStatutes(result.statutes)
         setIsMock(result.isMock || false)
+        setModelUsed(result.model_used || model)
       } else {
         setError(result.error || "Failed to identify statutes")
       }
@@ -60,7 +66,9 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
       <Card>
         <CardHeader>
           <CardTitle>Statute Identification</CardTitle>
-          <CardDescription>Identify relevant statutes and legal provisions from case descriptions</CardDescription>
+          <CardDescription>
+            Identify relevant Indian statutes and legal provisions from case descriptions
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -77,6 +85,7 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
               />
             </div>
           </div>
+          <FileUploader onTextExtracted={(text) => setText(text)} onError={(errorMsg) => setError(errorMsg)} />
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => setText("")}>
@@ -109,13 +118,21 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
       {statutes.length > 0 && (
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <CardTitle>Identified Statutes</CardTitle>
-              {isMock && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full flex items-center">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Mock Data
-                </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle>Identified Statutes</CardTitle>
+                {isMock && (
+                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Mock Data
+                  </span>
+                )}
+              </div>
+              {modelUsed && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Info className="h-3 w-3" />
+                  {modelUsed}
+                </Badge>
               )}
             </div>
           </CardHeader>
@@ -125,7 +142,17 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
                 <div key={statute.id} className="bg-muted p-4 rounded-md">
                   <div className="flex justify-between">
                     <h3 className="font-medium">{statute.name}</h3>
-                    <Button variant="ghost" size="sm" className="h-6 gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 gap-1"
+                      onClick={() =>
+                        window.open(
+                          `https://indiankanoon.org/search/?formInput=${encodeURIComponent(statute.name + " " + statute.section)}`,
+                          "_blank",
+                        )
+                      }
+                    >
                       <span className="text-xs">View</span>
                       <ExternalLink className="h-3 w-3" />
                     </Button>
@@ -137,7 +164,7 @@ export function StatuteIdentifier({ model }: StatuteIdentifierProps) {
             </div>
             {isMock && (
               <p className="text-xs text-muted-foreground mt-4">
-                Note: These are mock statutes. The Hugging Face API request failed, so we're showing simulated data.
+                Note: These are mock statutes. The backend request failed, so we're showing simulated data.
               </p>
             )}
           </CardContent>

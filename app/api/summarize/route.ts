@@ -1,53 +1,41 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { HfInference } from "@huggingface/inference"
 import { mockSummarize } from "@/services/mock-service"
 
-// Initialize the Hugging Face Inference client with error handling
-const getHfClient = () => {
-  const apiKey = process.env.HUGGINGFACE_API_KEY
-  if (!apiKey) {
-    throw new Error("HUGGINGFACE_API_KEY is not defined")
-  }
-  return new HfInference(apiKey)
-}
+// Python backend URL
+const PYTHON_BACKEND_URL = process.env.PYTHON_BACKEND_URL || "http://localhost:3000"
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the Hugging Face client
-    const hf = getHfClient()
-
     // Parse the request body
     const body = await request.json()
-    const { text, model } = body
+    const { text, model, type } = body
 
     if (!text) {
       return NextResponse.json({ error: "Text is required", success: false }, { status: 400 })
     }
 
-    // Map our model names to actual Hugging Face model IDs
-    const modelId = model === "legal-pegasus" ? "nsi319/legal-pegasus" : "nsi319/legal-led-base-16384"
-
-    console.log(`Summarizing text with model: ${modelId}`)
+    console.log(`Summarizing text with model: ${model}`)
 
     try {
-      // Call the Hugging Face API for summarization
-      const result = await hf.summarization({
-        model: modelId,
-        inputs: text,
-        parameters: {
-          max_length: 250,
-          min_length: 50,
+      // Forward the request to the Python backend
+      const response = await fetch(`${PYTHON_BACKEND_URL}/summarize`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({ text, model, type }),
       })
 
+      if (!response.ok) {
+        throw new Error(`Python backend returned status ${response.status}`)
+      }
+
+      const result = await response.json()
       console.log("Summarization result:", result)
 
-      return NextResponse.json({
-        summary: result.summary_text,
-        success: true,
-      })
+      return NextResponse.json(result)
     } catch (apiError) {
-      console.error("Hugging Face API error:", apiError)
+      console.error("Python backend error:", apiError)
 
       // Use mock service as fallback
       console.log("Using mock service as fallback")

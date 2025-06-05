@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://lawgic.vercel.app'), 
   title: 'Lawgic – Your Legal AI Assistant',
   description: 'Lawgic uses AI to summarize legal documents, predict judgments, and identify relevant statutes for smarter legal help.',
   generator: 'Kaif Imteyaz',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Lawgic – Your Legal AI Assistant',
     description: 'Lawgic uses AI to summarize legal documents, predict judgments, and identify relevant statutes for smarter legal help.',
-    url: '',
+    url: 'https:', // Updated URL
     siteName: 'Lawgic',
     images: [
       {
@@ -29,8 +30,8 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   icons: {
-    icon: '/favicon.ico',  
-    shortcut: '/favicon.ico', 
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
 }
@@ -42,11 +43,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      </head>
       <body>{children}</body>
     </html>
   )

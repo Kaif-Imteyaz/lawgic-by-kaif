@@ -1,10 +1,10 @@
 export const env = {
-  NEXT_PUBLIC_HF_API_TOKEN: process.env.NEXT_PUBLIC_HF_API_TOKEN,
+  HUGGINGFACE_API_KEY: process.env.HUGGINGFACE_API_KEY,
 }
 
 // Validate
 export function validateEnv() {
-  const requiredEnvVars = ["NEXT_PUBLIC_HF_API_TOKEN"]
+  const requiredEnvVars = ["HUGGINGFACE_API_KEY"]
   const missingEnvVars = requiredEnvVars.filter((key) => !env[key as keyof typeof env])
 
   if (missingEnvVars.length > 0) {

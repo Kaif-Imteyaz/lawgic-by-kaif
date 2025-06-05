@@ -1,9 +1,10 @@
-// Mock service for fallback when Hugging Face API fails
+// Mock service for fallback when Python backend fails
 
 export function mockSummarize(text: string) {
   return {
-    summary: `This is a mock summary of the legal document.\n\nThe document appears to discuss legal matters related to contracts, obligations, and potential remedies. Key points include discussion of contractual terms, potential breaches, and legal implications under relevant statutes.`,
+    summary: `This is a mock summary of the Indian legal document.\n\nThe document appears to discuss legal matters related to contracts, obligations, and potential remedies under Indian law. Key points include discussion of contractual terms, potential breaches, and legal implications under relevant Indian statutes.`,
     success: true,
+    model_used: "Mock service",
   }
 }
 
@@ -13,10 +14,11 @@ export function mockPredictJudgment(facts: string) {
 Confidence: 78%
 Reasoning:
 1. Based on the facts presented, there appears to be a clear contractual obligation that was not fulfilled
-2. The defendant's actions do not meet the standard of reasonable care expected in similar situations
-3. Precedent from similar cases supports the plaintiff's position`,
+2. The defendant's actions do not meet the standard of reasonable care expected in similar situations under Indian law
+3. Precedent from similar cases in Indian courts supports the plaintiff's position`,
     confidence: 78,
     success: true,
+    model_used: "Mock service",
   }
 }
 
@@ -43,5 +45,6 @@ export function mockIdentifyStatutes() {
       },
     ],
     success: true,
+    model_used: "Mock service",
   }
 }

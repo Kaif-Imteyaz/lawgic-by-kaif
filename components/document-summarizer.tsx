@@ -4,10 +4,12 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowRight, Loader2, AlertTriangle } from "lucide-react"
+import { ArrowRight, Loader2, AlertTriangle, Info } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { FileUploader } from "@/components/file-uploader"
 
 interface DocumentSummarizerProps {
   model: string
@@ -20,6 +22,7 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
   const [summaryType, setSummaryType] = useState("abstractive")
   const [error, setError] = useState("")
   const [isMock, setIsMock] = useState(false)
+  const [modelUsed, setModelUsed] = useState("")
 
   const handleSubmit = async () => {
     if (!input.trim()) return
@@ -28,6 +31,7 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
     setOutput("")
     setError("")
     setIsMock(false)
+    setModelUsed("")
 
     try {
       const response = await fetch("/api/summarize", {
@@ -47,6 +51,7 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
       if (result.success) {
         setOutput(result.summary)
         setIsMock(result.isMock || false)
+        setModelUsed(result.model_used || model)
       } else {
         setError(result.error || "Failed to generate summary")
       }
@@ -63,7 +68,9 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
       <Card>
         <CardHeader>
           <CardTitle>Document Summarization</CardTitle>
-          <CardDescription>Generate concise summaries of legal documents, judgments, and case files</CardDescription>
+          <CardDescription>
+            Generate concise summaries of Indian legal documents, judgments, and case files
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -95,6 +102,7 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
               </Select>
             </div>
           </div>
+          <FileUploader onTextExtracted={(text) => setInput(text)} onError={(errorMsg) => setError(errorMsg)} />
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => setInput("")}>
@@ -127,21 +135,29 @@ export function DocumentSummarizer({ model }: DocumentSummarizerProps) {
       {output && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Summary
-              {isMock && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full flex items-center">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Mock Data
-                </span>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                Summary
+                {isMock && (
+                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Mock Data
+                  </span>
+                )}
+              </CardTitle>
+              {modelUsed && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Info className="h-3 w-3" />
+                  {modelUsed}
+                </Badge>
               )}
-            </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="bg-muted p-4 rounded-md whitespace-pre-wrap">{output}</div>
             {isMock && (
               <p className="text-xs text-muted-foreground mt-2">
-                Note: This is a mock summary. The Hugging Face API request failed, so we're showing simulated data.
+                Note: This is a mock summary. The backend request failed, so we're showing simulated data.
               </p>
             )}
           </CardContent>
